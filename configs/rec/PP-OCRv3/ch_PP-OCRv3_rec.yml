@@ -80,7 +80,7 @@ Train:
     data_dir:  D:\code\Python\PaddleOCR\PaddleOCR\train\train_data\images
     ext_op_transform_idx: 1
     label_file_list:
-    - D:\code\Python\PaddleOCR\PaddleOCR\train\train_data\outPart60DictLabel20.txt
+    - D:\code\Python\PaddleOCR\PaddleOCR\train\train_data\clean_outPart60DictLabel20.txt
     transforms:
     - DecodeImage:
         img_mode: BGR
@@ -111,7 +111,7 @@ Eval:
     name: SimpleDataSet
     data_dir: D:\code\Python\PaddleOCR\PaddleOCR\train\eval_data\images
     label_file_list:
-    - D:\code\Python\PaddleOCR\PaddleOCR\train\eval_data\label.txt
+    - D:\code\Python\PaddleOCR\PaddleOCR\train\eval_data\clean_label.txt
     transforms:
     - DecodeImage:
         img_mode: BGR

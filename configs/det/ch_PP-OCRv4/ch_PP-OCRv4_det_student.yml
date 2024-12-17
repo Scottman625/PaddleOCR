@@ -1,7 +1,7 @@
 Global:
   debug: false
   use_gpu: true
-  epoch_num: &epoch_num 500
+  epoch_num: &epoch_num 100
   log_smooth_window: 20
   print_batch_step: 100
   save_model_dir: ./output/ch_PP-OCRv4
@@ -14,7 +14,7 @@ Global:
   pretrained_model: https://paddleocr.bj.bcebos.com/pretrained/PPLCNetV3_x0_75_ocr_det.pdparams
   save_inference_dir: null
   use_visualdl: false
-  infer_img: doc/imgs_en/img_10.jpg
+  infer_img: docs\images\en_3.png
   save_res_path: ./checkpoints/det_db/predicts_db.txt
   distributed: true
 
@@ -69,9 +69,9 @@ Metric:
 Train:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data/icdar2015/text_localization/
+    data_dir: .\train_data\train\det\images
     label_file_list:
-      - ./train_data/icdar2015/text_localization/train_icdar2015_label.txt
+      - .\train_data\train\det\labels_format.json
     ratio_list: [1.0]
     transforms:
     - DecodeImage:
@@ -137,9 +137,9 @@ Train:
 Eval:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data/icdar2015/text_localization/
+    data_dir: .\train_data\test\det\images
     label_file_list:
-      - ./train_data/icdar2015/text_localization/test_icdar2015_label.txt
+      - .\train_data\test\det\labels_format.json
     transforms:
     - DecodeImage:
         img_mode: BGR

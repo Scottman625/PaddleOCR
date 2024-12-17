@@ -4,21 +4,21 @@ Global:
   epoch_num: 200
   log_smooth_window: 20
   print_batch_step: 10
-  save_model_dir: ./output/rec_ppocr_v4_hgnet
+  save_model_dir: .\output\rec_ppocr_v4_hgnet
   save_epoch_step: 10
   eval_batch_step: [0, 2000]
   cal_metric_during_train: true
-  pretrained_model:
+  pretrained_model: .\pretrain_models\ch_PP-OCRv4_rec_server_train\best_accuracy.pdparams
   checkpoints:
   save_inference_dir:
   use_visualdl: false
-  infer_img: doc/imgs_words/ch/word_1.jpg
-  character_dict_path: ppocr/utils/ppocr_keys_v1.txt
+  infer_img: doc\imgs_words\ch\word_1.jpg
+  character_dict_path: ppocr\utils\combine_keys_dict.txt
   max_text_length: &max_text_length 25
   infer_mode: false
   use_space_char: true
   distributed: true
-  save_res_path: ./output/rec/predicts_ppocrv3.txt
+  save_res_path: .\output\rec\predicts_ppocrv4.txt
 
 
 Optimizer:
@@ -74,10 +74,10 @@ Train:
   dataset:
     name: MultiScaleDataSet
     ds_width: false
-    data_dir: ./train_data/
+    data_dir: .\train_data\train\images_v2\images
     ext_op_transform_idx: 1
     label_file_list:
-    - ./train_data/train_list.txt
+    - .\train_data\train\images_v2\labels.txt
     transforms:
     - DecodeImage:
         img_mode: BGR
@@ -112,9 +112,9 @@ Train:
 Eval:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data
+    data_dir: .\train_data\test\images_v2\images
     label_file_list:
-    - ./train_data/val_list.txt
+    - .\train_data\test\images_v2\labels.txt
     transforms:
     - DecodeImage:
         img_mode: BGR

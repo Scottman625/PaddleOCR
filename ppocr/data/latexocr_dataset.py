@@ -153,11 +153,11 @@ class LaTeXOCRDataSet(Dataset):
 
         except:
 
-            self.logger.error(
-                "When parsing line {}, error happened with msg: {}".format(
-                    data["img_path"], traceback.format_exc()
-                )
-            )
+            # self.logger.error(
+            #     "When parsing line {}, error happened with msg: {}".format(
+            #         data["img_path"], traceback.format_exc()
+            #     )
+            # )
             outs = None
 
         if outs is None:

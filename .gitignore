@@ -34,3 +34,7 @@ test_tipc/web/models/
 test_tipc/web/node_modules/
 venv/
 *.pdparams
+*.pdiparams
+output/
+train/eval_data/images/
+pretrain_models/

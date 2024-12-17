@@ -10,8 +10,8 @@ Global:
   - 0
   - 2000
   cal_metric_during_train: true
-  pretrained_model: null
-  checkpoints: ./output/rec_dkd_400w_svtr_ctc_lcnet_blank_dkd0.1/latest
+  pretrained_model: ./pretrain_models/best_accuracy.pdparams
+  checkpoints: ""
   save_inference_dir: null
   use_visualdl: false
   infer_img: doc/imgs_words/ch/word_1.jpg
@@ -177,9 +177,9 @@ Metric:
 Train:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data/
+    data_dir: ./train/train_data/images
     label_file_list:
-    - ./train_data/train_list.txt
+    - ./train/train_data/clean_outPart60DictLabel20.txt
     ratio_list:
     - 1.0
     transforms:
@@ -205,9 +205,9 @@ Train:
 Eval:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data
+    data_dir: ./train/eval_data/images
     label_file_list:
-    - ./train_data/val_list.txt
+    - ./train/eval_data/clean_label.txt
     transforms:
     - DecodeImage:
         img_mode: BGR

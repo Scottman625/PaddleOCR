@@ -118,12 +118,12 @@ class PubTabDataSet(Dataset):
         except:
             import traceback
 
-            err = traceback.format_exc()
-            self.logger.error(
-                "When parsing line {}, error happened with msg: {}".format(
-                    data_line, err
-                )
-            )
+            # err = traceback.format_exc()
+            # self.logger.error(
+            #     "When parsing line {}, error happened with msg: {}".format(
+            #         data_line, err
+            #     )
+            # )
             outs = None
         if outs is None:
             rnd_idx = (

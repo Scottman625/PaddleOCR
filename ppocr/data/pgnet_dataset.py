@@ -93,11 +93,11 @@ class PGDataSet(Dataset):
                 data["image"] = img
             outs = transform(data, self.ops)
         except Exception as e:
-            self.logger.error(
-                "When parsing line {}, error happened with msg: {}".format(
-                    self.data_idx_order_list[idx], e
-                )
-            )
+            # self.logger.error(
+            #     "When parsing line {}, error happened with msg: {}".format(
+            #         self.data_idx_order_list[idx], e
+            #     )
+            # )
             outs = None
         if outs is None:
             return self.__getitem__(np.random.randint(self.__len__()))

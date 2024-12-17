@@ -1,0 +1,201 @@
+Global:
+  debug: false
+  use_gpu: true
+  epoch_num: 200
+  log_smooth_window: 20
+  print_batch_step: 10
+  save_model_dir: .\output\det_rec_ppocr_v4_hgnet
+  save_epoch_step: 10
+  eval_batch_step: [0, 2000]
+  cal_metric_during_train: true
+  pretrained_model: .\pretrain_models\ch_PP-OCRv4_rec_server_train\best_accuracy.pdparams
+  checkpoints:
+  save_inference_dir:
+  use_visualdl: false
+  infer_img: doc\imgs_words\ch\word_1.jpg
+  character_dict_path: ppocr\utils\ppocr_ch_dict.txt
+  max_text_length: &max_text_length 25
+  infer_mode: false
+  use_space_char: true
+  distributed: true
+  save_res_path: .\output\rec\predicts_ppocrv4.txt
+
+Optimizer:
+  name: Adam
+  beta1: 0.9
+  beta2: 0.999
+  lr:
+    name: Cosine
+    learning_rate: 0.001
+    warmup_epoch: 5
+  regularizer:
+    name: L2
+    factor: 3.0e-05
+
+Architecture:
+  name: PP-OCRv4
+  model_type: det_rec
+  algorithm: PPOCR
+  DetModule:  # 检测模块配置
+    name: DBNet
+    Backbone:
+      name: MobileNetV3
+      scale: 0.5
+      model_name: large
+      disable_se: true
+    Neck:
+      name: DBFPN
+      out_channels: 256
+    Head:
+      name: DBHead
+      k: 50
+  RecModule:  # 识别模块配置
+    name: CRNN
+    Backbone:
+      name: PPHGNet_small
+    Head:
+      name: MultiHead
+      head_list:
+        - CTCHead:
+            Neck:
+              name: svtr
+              dims: 120
+              depth: 2
+              hidden_dims: 120
+              kernel_size: [1, 3]
+              use_guide: True
+            Head:
+              fc_decay: 0.00001
+        - NRTRHead:
+            nrtr_dim: 384
+            max_text_length: *max_text_length
+
+Loss:
+  name: CombinedLoss
+  det_loss:
+    name: DBLoss
+    balance_loss: true
+    main_loss_type: DiceLoss
+    alpha: 5
+    beta: 10
+    ohem_ratio: 3
+  rec_loss:
+    name: MultiLoss
+    loss_config_list:
+      - CTCLoss:
+      - NRTRLoss:
+
+PostProcess:  
+  det_post_process:
+    name: DBPostProcess
+    thresh: 0.3
+    box_thresh: 0.6
+    max_candidates: 1000
+    unclip_ratio: 1.5
+  rec_post_process:
+    name: CTCLabelDecode
+
+Metric:
+  det_metric:
+    name: DetMetric
+  rec_metric:
+    name: RecMetric
+    main_indicator: acc
+
+Train:
+  dataset:
+    name: CombinedDataSet
+    datasets:
+      - name: SimpleDataSet
+        data_dir: .\train_data\train\images_v2\images
+        label_file_list:
+        - .\train_data\train\images_v2\labels.json
+        transforms:
+          - DecodeImage:
+              img_mode: BGR
+              channel_first: false
+          - DetLabelEncode: null
+          - RecResizeImg:
+              image_shape: [3, 48, 320]
+          - KeepKeys:
+              keep_keys:
+              - image
+              - label
+              - polygons
+              - transcript
+      - name: MultiScaleDataSet
+        ds_width: false
+        data_dir: .\train_data\test\images_v2\images
+        ext_op_transform_idx: 1
+        label_file_list:
+        - .\train_data\test\images_v2\labels.json
+        transforms:
+        - DecodeImage:
+            img_mode: BGR
+            channel_first: false
+        - RecConAug:
+            prob: 0.5
+            ext_data_num: 2
+            image_shape: [48, 320, 3]
+            max_text_length: *max_text_length
+        - RecAug:
+        - MultiLabelEncode:
+            gtc_encode: NRTRLabelEncode
+        - KeepKeys:
+            keep_keys:
+            - image
+            - label_ctc
+            - label_gtc
+            - length
+            - valid_ratio
+  loader:
+    shuffle: true
+    batch_size_per_card: 16
+    drop_last: true
+    num_workers: 8
+
+Eval:
+  dataset:
+    name: CombinedDataSet
+    datasets:
+      - name: SimpleDataSet
+        data_dir: .\train_data\test\images_v2\images
+        label_file_list:
+        - .\train_data\test\test_labels.txt
+        transforms:
+          - DecodeImage:
+              img_mode: BGR
+              channel_first: false
+          - DetLabelEncode: null
+          - RecResizeImg:
+              image_shape: [3, 48, 320]
+          - KeepKeys:
+              keep_keys:
+              - image
+              - label
+              - polygons
+              - transcript
+      - name: SimpleDataSet
+        data_dir: .\train_data\test\images
+        label_file_list:
+        - .\train_data\test\test_labels.txt
+        transforms:
+          - DecodeImage:
+              img_mode: BGR
+              channel_first: false
+          - MultiLabelEncode:
+              gtc_encode: NRTRLabelEncode
+          - RecResizeImg:
+              image_shape: [3, 48, 320]
+          - KeepKeys:
+              keep_keys:
+              - image
+              - label_ctc
+              - label_gtc
+              - length
+              - valid_ratio
+  loader:
+    shuffle: false
+    drop_last: false
+    batch_size_per_card: 16
+    num_workers: 4
